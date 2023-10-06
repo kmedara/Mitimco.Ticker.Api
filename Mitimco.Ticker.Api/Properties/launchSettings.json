@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Ticker.Api": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7250"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 30015,
+      "useSSL": false
+    }
+  }
+}
