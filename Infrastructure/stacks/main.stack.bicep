@@ -2,7 +2,12 @@
 
 //TODO Expose Function App endpoints through API Management instance
 
+//TODO Register apim with b2c tenant
+
+//TODO 
 //NOTE Function app vnet integration only works with plans higher than consumptions...awful
+
+//All Authentication and authorization will take place through infrastucture rather than code
 
 param project string
 param environment string
