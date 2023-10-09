@@ -1,28 +1,14 @@
-//Managed IDentities only
+//TODO create 'UserAssigned' service principal with necessary role assignments for automated deployment
 
-/*
-Function App
+//TODO Expose Function App endpoints through API Management instance
 
-app subnet
-private subnet 
-private nsg
+//NOTE Function app vnet integration only works with plans higher than consumptions...awful
 
-secure storage account with service endpoint
-param department string = 'Engineering'
-param environment string = 'dev'
-param location string = 'eastus'
-//param appvnet string = 'engineering-dev-east'
-
-param vnetGroup = 'Engineer'
-*/
-// param appSettings AppSettings
-
-param division string
+param project string
 param environment string
 param location string
 
-param subscriptionId string
-
+param hostingSkuTier string = 'Dynamic'
 @description('Application settings object\nSee fnApp construct for user defined environment variable object\nimporting from another file was not working (feature is in preview)')
 param appSettings object
 
@@ -35,7 +21,7 @@ param vnetName string
 param vnetRg string
 
 @description('prefix used for each resource created\nRuns toLower() on department, environment, and location\n using a hyphen as a delimiter')
-var prefix = '${toLower(division)}-${toLower(environment)}-${toLower(location)}'
+var prefix = '${toLower(project)}-${toLower(environment)}-${toLower(location)}'
 
 module vnet '../constructs/vnet.bicep' = { 
   params:{ name: vnetName } 
@@ -43,26 +29,41 @@ module vnet '../constructs/vnet.bicep' = {
   scope: resourceGroup(vnetRg)
 }
 
+targetScope = 'subscription'
 
-module stackRg '../constructs/rg.bicep' = {
-  name: '${deployment().name}-group'
-  params: {
-    name: prefix
-    subscriptionId: subscriptionId
-    location: location
-  }
-  scope: subscription(subscriptionId)
+resource rg  'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: '${prefix}-rg'
+  location: location
 }
 
+var appSubnet = first(filter(vnet.outputs.subnets, (subnet) => contains(subnet.name, fnAppSubnet))).id
+// output sub string = subnetid
 module fnApp '../constructs/fnapp.bicep' = {
   name: '${deployment().name}-fnAppDeploy'
   params: {
-    name : prefix
-    location: stackRg.outputs.location
-    subnetId: first(filter(vnet.outputs.subnets, (subnet) => contains(subnet.name, fnAppSubnet) )).name
+    prefix : prefix
+    location: rg.location
+    subnetId: appSubnet
     appSettings: appSettings
+    hostingSkuTier: hostingSkuTier
   }
-  scope: resourceGroup(stackRg.name)
+  scope: rg
+}
+
+/*
+Vnet integration is only allowed in higher tier hosting plans, none of which are truly serverless
+Poor implementation by microsoft unfortunately
+*/
+module integ '../constructs/integration.bicep' = if (hostingSkuTier != 'Dynamic'){
+  name: '${deployment().name}-appVnetIntegrationDeploy'
+  params: {
+    prefix: fnApp.outputs.appName
+    vnetId: vnet.outputs.self.id
+  }
+  scope: rg
+  dependsOn: [
+    fnApp
+  ]
 }
 
 /* API Management
