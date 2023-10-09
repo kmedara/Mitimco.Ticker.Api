@@ -9,52 +9,69 @@ using System.Threading.Tasks;
 using Ticker.Domain;
 using Ticker.Domain.Ticker;
 using Ticker.Mediator.Http.AlphaVantage;
+using Ticker.Validation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ticker.Mediator.Requests.Ticker
 {
-    public record TickerAlphaQueryRequest : IRequest<double>
+    [YearToDateDefaultRange(nameof(From), nameof(To))]
+    public record TickerAlphaQueryRequest : IRequest<decimal>
     {
         [Required]
         public required string Ticker { get; set; }
 
         [Required]
         public required string BenchmarkTicker { get; set; }
+
+        [Required]
         public DateTime? From { get; set; }
+        [Required]
         public DateTime? To { get; set; }
     }
 
-    internal class TickerAlphaQueryRequestHandler : IRequestHandler<TickerAlphaQueryRequest, double>
+    internal class TickerAlphaQueryRequestHandler : IRequestHandler<TickerAlphaQueryRequest, decimal>
     {
         private readonly IAlphaVantageHttpClient _client;
-        private readonly ITickerCalculationDomainService _service;
+        private readonly ITickerCalculator _calculator;
 
-        public TickerAlphaQueryRequestHandler(IAlphaVantageHttpClient client, ITickerCalculationDomainService service)
+        public TickerAlphaQueryRequestHandler(IAlphaVantageHttpClient client, ITickerCalculator calculator)
         {
             _client = client;
-            _service = service;
+            _calculator = calculator;
         }
-        public async Task<double> Handle(TickerAlphaQueryRequest request, CancellationToken cancellationToken)
+        public async Task<decimal> Handle(TickerAlphaQueryRequest request, CancellationToken cancellationToken)
         {
             var stockDataPoints = await _client.GetDailyOHLCV(request.Ticker);
             var benchMarkDataPoints = await _client.GetDailyOHLCV(request.BenchmarkTicker);
-            var risk = (await _client.GetCurrentRiskFreeRate()).data.FirstOrDefault()!.Value;
-            var riskFreeRate = risk / 100;
+            var risk = ((await _client.GetCurrentRiskFreeRate()).Data.Select(el => decimal.Parse(el.Value)).Average()) / 100;
 
             var stockPrices = stockDataPoints.TimeSeriesDaily.ToDictionary(item => DateTime.Parse(item.Key), item => new OHLCV { Close = item.Value.Close });
             var benchmarkPrices = benchMarkDataPoints.TimeSeriesDaily.ToDictionary(item => DateTime.Parse(item.Key), item => new OHLCV { Close = item.Value.Close });
 
-
-            var lg = new LinearRegression(stockDataPoints.TimeSeriesDaily.Select(el => Double.Parse(el.Value.Close)).ToArray(), benchMarkDataPoints.TimeSeriesDaily.Select(el => Double.Parse(el.Value.Close)).ToArray());
-            lg.Plot();
-
-
-            var alpha = _service.CalculateAlpha(
+            ///comes out pretty close to the jenson alpha?
+            var alpha = _calculator.Alpha(
                stockPrices,
                benchmarkPrices,
-               request.From!.Value,
-                request.To!.Value,
-                riskFreeRate);
+               request.From,
+                request.To,
+                risk);
+
+
+            //var priceData = stockPrices
+
+            //    .OrderBy(item => item.Key)
+            //    .Select(item => decimal.Parse(item.Value.Close)).ToArray();
+
+            //var priceData2 = benchmarkPrices
+
+            //    .OrderBy(item => item.Key)
+            //    .Select(item => decimal.Parse(item.Value.Close)).ToArray();
+
+
+            ///linear regression worked when comparing a baseline (aapl to aapl)
+            //var calc =_calculator.NetLinear(priceData, priceData2, risk);
+
+            //_calculator.LinearRegression(priceData, priceData2, out var rsqaured, out var alph, out var beta);
 
             return alpha;
         }

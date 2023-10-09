@@ -9,8 +9,8 @@ namespace Ticker.Mediator.Http.AlphaVantage.Responses
 
         public string Interval {  get; set; } = string.Empty;
 
-        public string unit { get; set; } = string.Empty;
+        public string Unit { get; set; } = string.Empty;
 
-        public List<DatePrice> data { get; set; } = new List<DatePrice> { };
+        public List<DatePrice> Data { get; set; } = new List<DatePrice> { };
     }
 }

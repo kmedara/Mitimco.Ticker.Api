@@ -17,6 +17,7 @@ namespace Ticker.Api.Middleware
     /// Single Application Exception handler 
     /// //TODO: More robust error response based on Problem Details rfc 7807
     /// //TODO: Implement mapping between exceptions and status codes
+    /// this is a great library for problem details to port over to function apps https://github.com/khellang/Middleware/tree/master
     /// </summary>
 
     internal class ExceptionHandlingMiddleware : IFunctionsWorkerMiddleware
@@ -45,7 +46,7 @@ namespace Ticker.Api.Middleware
             }
         }
 
-        private ProblemDetails CreateProblemDetails(Exception ex, FunctionContext context)
+        private static ProblemDetails CreateProblemDetails(Exception ex, FunctionContext context)
         {
             var details = new StatusCodeProblemDetails(500);
 

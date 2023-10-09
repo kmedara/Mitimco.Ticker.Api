@@ -8,10 +8,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Ticker.Api.InputConverters;
 using Ticker.Api.Utility;
 using Ticker.Mediator.DependencyInjection;
 using Ticker.Mediator.Requests.Ticker;
+using Ticker.Api.InputBinding.Converters;
 
 namespace Ticker.Api.Functions.Ticker
 {

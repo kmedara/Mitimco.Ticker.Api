@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker.Converters;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Ticker.Api.InputConverters;
+using Ticker.Api.InputBinding.Converters;
 using Ticker.Api.Utility;
 using Ticker.Domain.AppSettings;
 using Ticker.Mediator.DependencyInjection;

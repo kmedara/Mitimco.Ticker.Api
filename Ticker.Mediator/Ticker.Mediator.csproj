@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ticker.Domain\Ticker.Domain.csproj" />
+    <ProjectReference Include="..\Ticker.Validation\Ticker.Validation.csproj" />
   </ItemGroup>
 
 </Project>

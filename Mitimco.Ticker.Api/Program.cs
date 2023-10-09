@@ -7,7 +7,6 @@ using Ticker.Domain.AppSettings;
 using Ticker.Domain.Ticker;
 using Ticker.Mediator.Extensions;
 using Ticker.Mediator.Http.AlphaVantage;
-
 var host = new HostBuilder()
             .ConfigureFunctionsWorkerDefaults(worker =>
             {
@@ -16,7 +15,7 @@ var host = new HostBuilder()
             .ConfigureServices(s =>
             {
                 s.AddHttpClientWithOptions<IAlphaVantageHttpClient, AlphaVantageHttpClient, AlphaApiConfigurationOptions>("ApiConfigurationOptions:AlphaApiConfigurationOptions")
-                .AddTransient<ITickerCalculationDomainService, TickerCalculationDomainService>()
+                .AddSingleton<ITickerCalculator, TickerCalculator>()
                 .AddPlatformMediator();
             })
             .Build();

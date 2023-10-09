@@ -38,8 +38,8 @@ namespace Ticker.Mediator.Http.AlphaVantage
             var query = buildQueryString(new Dictionary<string, string> {
                 { _options.ApiKey.Identifier, _options.ApiKey.Value },
                 { "function", "TREASURY_YIELD" },
-                { "maturity", "10year" },
-                { "interval", "daily" }
+                { "maturity", "3month" },
+                { "interval", "monthly" }
 
             });
             return await GetAsync<TreasuryYieldResponse>(query);

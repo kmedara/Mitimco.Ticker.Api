@@ -9,15 +9,15 @@ namespace Ticker.Domain.Ticker
     /// <summary>
     /// simple poco denoting a price related to a date, could be anything 
     /// </summary>
-    public class DatePrice
+    public struct DatePrice
     {
-        public DatePrice(DateTime date, double value)
+        public DatePrice(DateTime date, string value)
         {
             Date = date;
             Value = value;
         }
 
         public DateTime Date { get; set; }
-        public double Value {  get; set; }
+        public string Value {  get; set; }
     }
 }

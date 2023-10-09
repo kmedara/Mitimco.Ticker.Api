@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ticker.Domain.Ticker
 {
-    public interface ITickerCalculationDomainService
+    public interface ITickerCalculator
     {
         /// <summary>
         /// 
@@ -15,12 +15,14 @@ namespace Ticker.Domain.Ticker
         /// <param name="to"></param>
         /// <param name="timeSeries"></param>
         /// <returns></returns>
-        public List<DatePrice> CalculateReturns(DateTime? from, DateTime? to, Dictionary<DateTime, OHLCV> timeSeries);
+        public List<DatePrice> Returns(DateTime? from, DateTime? to, Dictionary<DateTime, OHLCV> timeSeries);
 
         /// <summary>
         /// https://firemymoneymanager.com/getting-started-using-python-to-find-alpha/
         /// https://learn.microsoft.com/en-us/archive/msdn-magazine/2015/july/test-run-linear-regression-using-csharp#understanding-linear-regression
         /// https://www.allquant.co/post/linear-regression-finding-alpha-and-beta
+        /// https://numerics.mathdotnet.com/Regression
+        /// https://www.newyorkfed.org/medialibrary/media/research/staff_reports/sr340.pdf
         /// </summary>
         /// <param name="historicalData"></param>
         /// <param name="benchMarkData"></param>
@@ -28,14 +30,18 @@ namespace Ticker.Domain.Ticker
         /// <param name="to"></param>
         /// <param name="riskFreeRate"></param>
         /// <returns></returns>
-        public double CalculateAlpha(Dictionary<DateTime, OHLCV> historicalData, Dictionary<DateTime, OHLCV> benchMarkData, DateTime from, DateTime to, double riskFreeRate);
+        public decimal Alpha(Dictionary<DateTime, OHLCV> historicalData, Dictionary<DateTime, OHLCV> benchMarkData, DateTime? from, DateTime? to, decimal riskFreeRate);
 
-        public double CalculateBeta(List<DatePrice> historicalData, List<DatePrice> benchMarkData);
+        public decimal Beta(List<DatePrice> historicalData, List<DatePrice> benchMarkData);
 
-        public double CalculateExpectedReturn(double beta, double riskFreeRate, List<DatePrice> benchMarkData);
+        public decimal ExpectedReturn(decimal beta, decimal riskFreeRate, List<DatePrice> benchMarkData);
 
-        public double Covariance(List<DatePrice> historicalData, List<DatePrice> benchMarkData);
+        public decimal Covariance(List<DatePrice> historicalData, List<DatePrice> benchMarkData);
 
-        public double Variance(List<DatePrice> data);
+        public void LinearRegression(decimal[] x, decimal[] y, out decimal rSquared, out decimal yIntercept, out decimal slope);
+
+        public (double, double) NetLinear(decimal[] x, decimal[] y, decimal risk);
+
+
     }
 }
