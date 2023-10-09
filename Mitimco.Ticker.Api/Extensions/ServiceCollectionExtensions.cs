@@ -84,9 +84,9 @@ namespace Ticker.Api.Extensions
         /// </summary>
         /// <typeparam name="TInterface"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
-        /// <typeparam name="TOptions"></typeparam>
+        /// <typeparam name="TOptions">Should align with a section of your app settings</typeparam>
         /// <param name="services"></param>
-        /// <param name="sectionName"></param>
+        /// <param name="sectionName">Configures options based on appsettings sectionName</param>
         /// <returns></returns>
         public static IServiceCollection AddHttpClientWithOptions<TInterface, TImplementation, TOptions>(this IServiceCollection services, string sectionName)
             where TInterface : class, IHttpClient<TOptions>
@@ -98,5 +98,17 @@ namespace Ticker.Api.Extensions
             services.AddHttpClient<TInterface, TImplementation>();
             return services;
         }
+
+        public static IServiceCollection AddHttpClientWithOptions<TInterface, TImplementation, TOptions>(this IServiceCollection services, Action<HttpClient> optionsWorker)
+           where TInterface : class, IHttpClient<TOptions>
+           where TImplementation : class, TInterface
+           where TOptions : ApiConfigurationOptions
+
+        {
+            services.AddHttpClient<TInterface, TImplementation>(optionsWorker);
+            return services;
+        }
+
+
     }
 }
