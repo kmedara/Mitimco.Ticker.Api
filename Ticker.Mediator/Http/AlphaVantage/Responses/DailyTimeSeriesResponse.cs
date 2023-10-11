@@ -17,6 +17,6 @@ namespace Ticker.Mediator.Http.AlphaVantage.Responses
         public AlphaVantageMetaData MetaData { get; set; }
 
         [JsonProperty("Time Series (Daily)")]
-        public Dictionary<string, AlphaVantageOHLCV> TimeSeriesDaily { get; set; }
+        public Dictionary<DateTime, AlphaVantageOHLCV> TimeSeriesDaily { get; set; }
     }
 }

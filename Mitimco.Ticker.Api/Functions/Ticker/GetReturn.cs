@@ -23,7 +23,8 @@ namespace Ticker.Api.Functions.Ticker
         }
 
         [Function(nameof(GetReturn))]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = Routes.Ticker.Returns.Get)] HttpRequestData req,
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = Routes.Ticker.Returns.Get)] HttpRequestData req,
             [InputConverter(typeof(TickerReturnQueryRequestConverter))] TickerReturnQueryRequest request)
         {
             var result = await _mediator.Send(request);

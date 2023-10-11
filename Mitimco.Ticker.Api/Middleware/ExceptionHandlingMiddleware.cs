@@ -56,7 +56,7 @@ namespace Ticker.Api.Middleware
             }
             details.Extensions.Add("InvocationId", context.InvocationId);
             details.Instance = context.FunctionDefinition.Name;
-            details.Detail = ex.Message;
+            details.Detail = ex.InnerException?.Message ?? ex.Message;
             return details;
         }
     }

@@ -11,13 +11,13 @@ namespace Ticker.Domain.Ticker
     /// </summary>
     public struct OHLCV
     {
-        public string Open { get; set; }
-        public string High { get; set; }
+        public decimal Open { get; set; }
+        public decimal High { get; set; }
 
-        public string Low { get; set; }
+        public decimal Low { get; set; }
 
-        public string Close { get; set; }
+        public decimal Close { get; set; }
 
-        public string Volume { get; set; }
+        public decimal Volume { get; set; }
     }
 }

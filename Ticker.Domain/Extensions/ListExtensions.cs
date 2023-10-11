@@ -11,7 +11,7 @@ namespace Ticker.Domain.Extensions
     {
         public static decimal Average(this List<DatePrice> list)
         {
-            return list.Select(el => decimal.Parse(el.Value)).Average();
+            return list.Select(el => el.Value).Average();
         }
     }
 }

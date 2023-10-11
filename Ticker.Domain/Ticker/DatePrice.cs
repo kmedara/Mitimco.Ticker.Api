@@ -11,13 +11,13 @@ namespace Ticker.Domain.Ticker
     /// </summary>
     public struct DatePrice
     {
-        public DatePrice(DateTime date, string value)
+        public DatePrice(DateTime date, decimal value)
         {
             Date = date;
             Value = value;
         }
 
         public DateTime Date { get; set; }
-        public string Value {  get; set; }
+        public decimal Value {  get; set; }
     }
 }

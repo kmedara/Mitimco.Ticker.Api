@@ -7,7 +7,7 @@ using Ticker.Validation;
 namespace Ticker.Mediator.Requests.Ticker
 {
     [YearToDateDefaultRange(nameof(From), nameof(To))]
-    public record TickerReturnQueryRequest : IRequest<TickerReturnQueryResponse>
+    public record TickerReturnQueryRequest : IRequest<IEnumerable<DatePrice>>
     {
         [Required]
         public required string Ticker { get; set; }
@@ -17,12 +17,7 @@ namespace Ticker.Mediator.Requests.Ticker
         public DateTime? To { get; set; }
     }
 
-    public class TickerReturnQueryResponse : List<DatePrice>
-    {
-        public TickerReturnQueryResponse(List<DatePrice> list) : base(list) { }
-    }
-
-    internal class TickerReturnQueryRequestHandler : IRequestHandler<TickerReturnQueryRequest, TickerReturnQueryResponse>
+    internal class TickerReturnQueryRequestHandler : IRequestHandler<TickerReturnQueryRequest, IEnumerable<DatePrice>>
     {
         private readonly IAlphaVantageHttpClient _client;
         private readonly ITickerCalculator _service;
@@ -32,12 +27,15 @@ namespace Ticker.Mediator.Requests.Ticker
             _client = client;
             _service = service;
         }
-        public async Task<TickerReturnQueryResponse> Handle(TickerReturnQueryRequest request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DatePrice>> Handle(TickerReturnQueryRequest request, CancellationToken cancellationToken)
         {
             var clientResponse = await _client.GetDailyOHLCV(request.Ticker);
-            var returns = _service.Returns(request.From, request.To, clientResponse.TimeSeriesDaily.ToDictionary(item => DateTime.Parse(item.Key), item => new OHLCV { Close = item.Value.Close }));
 
-            return new TickerReturnQueryResponse(returns);
+            var data = clientResponse.TimeSeriesDaily?.Select(el => el.Value.Close).ToArray() ?? throw new Exception($"Unable to find data for specified ticker: { request.Ticker }");
+
+            var returns = _service.Returns(data);
+
+            return returns.Select((e, i) => new DatePrice(clientResponse.TimeSeriesDaily.ElementAt(i).Key, e));
         }
     }
 
