@@ -44,17 +44,17 @@ namespace Ticker.Mediator.Requests.Ticker
             var stockDataPoints = await _client.GetDailyOHLCV(request.Ticker);
             var benchMarkDataPoints = await _client.GetDailyOHLCV(request.BenchmarkTicker);
             var risks = await _client.GetCurrentRiskFreeRate();
-            var risk = risks.Data.Select(el => el.Value).Average() / 100;
+            var risk = risks.Data.Select(el => el.Value).First() / 100;
 
             var stockPrices = stockDataPoints.TimeSeriesDaily?
-                .Where(el =>  request.From == null || el.Key >= request.From.Value.AddDays(-1))
+                .Where(el =>  request.From == null || el.Key >= request.From)
                 .Where(el => el.Key <= request.To || request.To == null)
                 .OrderBy(el => el.Key)
                 .Select(el => el.Value.Close)
                 .ToArray();
 
             var benchmarkPrices = benchMarkDataPoints.TimeSeriesDaily?
-                .Where(el => request.From == null || el.Key >= request.From.Value.AddDays(-1))
+                .Where(el => request.From == null || el.Key >= request.From.Value)
                 .Where(el => el.Key <= request.To || request.To == null)
                 .OrderBy(el => el.Key)
                 .Select(el => el.Value.Close)
@@ -66,11 +66,11 @@ namespace Ticker.Mediator.Requests.Ticker
             var bReturns = _calculator.Returns(benchmarkPrices);
 
 
-            var x = Fit.Line(hReturns.Select(el => (double)el).ToArray(), bReturns.Select(el => (double)el).ToArray());
+            var x = Fit.Line(stockPrices.Select(el => (double)el).ToArray(), benchmarkPrices.Select(el => (double)el).ToArray());
 
             var alpha = _calculator.Alpha(
-               hReturns,
-               bReturns,
+               stockPrices,
+               benchmarkPrices,
                 risk);
 
             return alpha;

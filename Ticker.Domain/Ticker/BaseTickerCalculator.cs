@@ -25,6 +25,11 @@ namespace Ticker.Domain.Ticker
         }
         #endregion
 
+        /// <summary>
+        /// Data must be in ascending order by date
+        /// </summary>
+        /// <param name="timeSeries"></param>
+        /// <returns></returns>
         public decimal[] Returns(decimal[] timeSeries)
         {
             decimal[] results = new decimal[timeSeries.Length];

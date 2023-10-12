@@ -38,7 +38,7 @@ namespace Ticker.Mediator.Http.AlphaVantage
             var query = buildQueryString(new Dictionary<string, string> {
                 { _options.ApiKey.Identifier, _options.ApiKey.Value },
                 { "function", "TREASURY_YIELD" },
-                { "maturity", "3month" },
+                { "maturity", "10year" },
                 { "interval", "monthly" }
 
             });
@@ -61,7 +61,12 @@ namespace Ticker.Mediator.Http.AlphaVantage
                 { "outputsize", "full" }
 
             });
-            return await GetAsync<AlphaVantageTimeSeriesDailyResponse>(query);
+
+            var result = await GetAsync<AlphaVantageTimeSeriesDailyResponse>(query);
+            if (result.TimeSeriesDaily == null)
+                throw new Exception($"Unable to retrieve data for { ticker }");
+           
+            return result;
 
         }
 

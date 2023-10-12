@@ -19,6 +19,7 @@ namespace Ticker.Domain.Ticker.AlphaCalculationStrategy
 
         /// <summary>
         /// Data should be in ascending order
+        /// https://learn.robinhood.com/articles/2lwYjCxcvUP4lcqQ3yXrgz/what-is-alpha/
         /// </summary>
         /// <param name="historicalReturns"></param>
         /// <param name="benchMarkReturns"></param>
@@ -26,8 +27,9 @@ namespace Ticker.Domain.Ticker.AlphaCalculationStrategy
         /// <returns></returns>
         public decimal Calculate(decimal[] historicalReturns, decimal[] benchMarkReturns, decimal riskFreeRate)
         {
+            if (historicalReturns?.Length != benchMarkReturns?.Length)
+                throw new ArgumentException("Data sets are not of equal length");
 
-                       
             var beta = Beta(historicalReturns, benchMarkReturns);
 
             var market  = CumulativeReturn(benchMarkReturns);
@@ -75,7 +77,7 @@ namespace Ticker.Domain.Ticker.AlphaCalculationStrategy
                 covariance += (historical[i] - hAvg) * (benchmark[i] - bAvg);
             }
 
-            return covariance / (historical.Length - 1);
+            return covariance / (historical.Length);
         }
 
         public decimal SqRt(decimal[] historical)
@@ -105,7 +107,7 @@ namespace Ticker.Domain.Ticker.AlphaCalculationStrategy
 
             ///variance is sum of squared differences divided by number of data points (use - 1 in denominator for sampling)
 
-            return variance / (returns.Length - 1);
+            return variance / (returns.Length);
         }
     }
 }
