@@ -47,7 +47,7 @@ namespace Ticker.Mediator.Requests.Ticker
             var risk = risks.Data.Select(el => el.Value).First() / 100;
 
             var stockPrices = stockDataPoints.TimeSeriesDaily?
-                .Where(el =>  request.From == null || el.Key >= request.From)
+                .Where(el =>  request.From == null || el.Key >= request.From.Value)
                 .Where(el => el.Key <= request.To || request.To == null)
                 .OrderBy(el => el.Key)
                 .Select(el => el.Value.Close)
@@ -62,12 +62,13 @@ namespace Ticker.Mediator.Requests.Ticker
 
             _calculator.SetAlphaStrategy(new CAPMFormulaStrategy());
 
-            var hReturns = _calculator.Returns(stockPrices);
-            var bReturns = _calculator.Returns(benchmarkPrices);
+            //var hReturns = _calculator.Returns(stockPrices);
+            //var bReturns = _calculator.Returns(benchmarkPrices);
 
 
             var x = Fit.Line(stockPrices.Select(el => (double)el).ToArray(), benchmarkPrices.Select(el => (double)el).ToArray());
 
+            //do i use prices or returns here?
             var alpha = _calculator.Alpha(
                stockPrices,
                benchmarkPrices,

@@ -42,7 +42,7 @@ namespace Ticker.Domain.Ticker
                 results[i - 1] = returnPercentage;
             }
 
-            return results.Where(el => el != 0).ToArray();
+            return results;
         }
         public void SetAlphaStrategy(IAlphaCalculationStrategy strategy)
         {
